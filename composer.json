@@ -1,6 +1,6 @@
 {
-  "name": "goetas/to-swift-mime-parser",
-  "description": "Parse a generic mail stream, and convert it to a SwiftMailer Message",
+  "name": "bariew/to-swift-mime-parser",
+  "description": "Temporary fork untill goetas fix the bug",
   "keywords": [
     "swift",
     "mail",
