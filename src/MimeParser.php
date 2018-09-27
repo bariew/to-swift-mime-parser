@@ -8,8 +8,8 @@ use Goetas\Mail\ToSwiftMailParser\Mime\HeaderDecoder;
 
 class MimeParser
 {
-    private const SWIFT_CONTAINER_CACHE_KEY = 'cache';
-    private const SWIFT_CONTAINER_ID_GENERATOR_KEY = 'mime.idgenerator';
+    const SWIFT_CONTAINER_CACHE_KEY = 'cache';
+    const SWIFT_CONTAINER_ID_GENERATOR_KEY = 'mime.idgenerator';
 
     protected $removeHeaders = array("Received", "From", "X-Original-To", "MIME-Version", "Received-SPF", "Delivered-To");
     protected $allowedHeaders = array("return-path", "subject");
@@ -42,7 +42,7 @@ class MimeParser
         $this->swiftContainer = $swiftContainer;
     }
 
-    private function getSwiftDependencyContainer(): \Swift_DependencyContainer
+    private function getSwiftDependencyContainer()
     {
         if ($this->swiftContainer === null) {
             $this->swiftContainer = \Swift_DependencyContainer::getInstance();
@@ -50,17 +50,17 @@ class MimeParser
         return $this->swiftContainer;
     }
 
-    private function getIdGenertor(): \Swift_IdGenerator
+    private function getIdGenertor()
     {
         return $this->getSwiftDependencyContainer()->lookup(self::SWIFT_CONTAINER_ID_GENERATOR_KEY);
     }
 
-    private function getCache(): \Swift_KeyCache
+    private function getCache()
     {
         return $this->getSwiftDependencyContainer()->lookup(self::SWIFT_CONTAINER_CACHE_KEY);
     }
 
-    public function parseFile(string $path, bool $fillHeaders = false, \Swift_Mime_SimpleMimeEntity $message = null): \Swift_Mime_SimpleMimeEntity
+    public function parseFile(string $path, bool $fillHeaders = false, \Swift_Mime_SimpleMimeEntity $message = null)
     {
         $fp = fopen($path, "rb");
         $message = $this->parseStream($fp, $fillHeaders, $message);
@@ -68,7 +68,7 @@ class MimeParser
         return $message;
     }
 
-    public function parseString(string $string, bool $fillHeaders = false, \Swift_Mime_SimpleMimeEntity $message = null): \Swift_Mime_SimpleMimeEntity
+    public function parseString(string $string, bool $fillHeaders = false, \Swift_Mime_SimpleMimeEntity $message = null)
     {
         $fp = fopen("php://memory", "wb");
         fwrite($fp, $string);
@@ -81,7 +81,7 @@ class MimeParser
     /**
      * @param resource $stream
      */
-    public function parseStream($stream, bool $fillHeaders = false, \Swift_Mime_SimpleMimeEntity $message = null): \Swift_Mime_SimpleMimeEntity
+    public function parseStream($stream, bool $fillHeaders = false, \Swift_Mime_SimpleMimeEntity $message = null)
     {
         $partHeaders = $this->extractHeaders($stream);
 
@@ -105,7 +105,7 @@ class MimeParser
         return $message;
     }
 
-    protected function extractHeaders($stream): array
+    protected function extractHeaders($stream)
     {
         $headers = array();
         $hName = null;
@@ -132,7 +132,7 @@ class MimeParser
         return $headers;
     }
 
-    private function filterHeaders(array $headers): array
+    private function filterHeaders(array $headers)
     {
         foreach ($headers as $header => $values) {
             if (in_array(strtolower($header), $this->removeHeaders) && !in_array(strtolower($header), $this->allowedHeaders)) {
@@ -142,7 +142,7 @@ class MimeParser
         return $headers;
     }
 
-    protected function parseParts($stream, array $partHeaders): array
+    protected function parseParts($stream, array $partHeaders)
     {
         $parts = array();
         $contentType = $this->extractValueHeader($this->getContentType($partHeaders));
@@ -203,7 +203,7 @@ class MimeParser
         return $parts;
     }
 
-    private function extractValueHeader($header): string
+    private function extractValueHeader($header)
     {
         $pos = stripos($header, ';');
         if ($pos !== false) {
@@ -213,7 +213,7 @@ class MimeParser
         }
     }
 
-    private function getContentType(array $partHeaders): string
+    private function getContentType(array $partHeaders)
     {
         if (array_key_exists('content-type', $partHeaders)) {
             return $partHeaders['content-type'];
@@ -222,7 +222,7 @@ class MimeParser
         return '';
     }
 
-    private function extractHeaderParts(string $header): array
+    private function extractHeaderParts(string $header)
     {
         if (stripos($header, ';') !== false) {
 
@@ -246,7 +246,7 @@ class MimeParser
      * @throws Exception\EndOfMultiPartReachedException
      * @throws Exception\EndOfPartReachedException
      */
-    protected function extractPart($stream, ?string $boundary, string $encoding): void
+    protected function extractPart($stream, $boundary, $encoding)
     {
         $rows = array();
         while (!feof($stream)) {
@@ -265,7 +265,7 @@ class MimeParser
         throw new Exception\EndOfMultiPartReachedException($this->contentDecoder->decode(implode("", $rows), $encoding));
     }
 
-    private function getTransferEncoding(array $partHeaders): string
+    private function getTransferEncoding(array $partHeaders)
     {
         if (array_key_exists('content-transfer-encoding', $partHeaders)) {
             return $partHeaders['content-transfer-encoding'];
@@ -274,7 +274,7 @@ class MimeParser
         return '';
     }
 
-    protected function createHeadersSet(array $headersRaw): \Swift_Mime_SimpleHeaderSet
+    protected function createHeadersSet(array $headersRaw)
     {
         $headers = \Swift_DependencyContainer::getInstance()->lookup('mime.headerset');
 
@@ -324,7 +324,7 @@ class MimeParser
         return $headers;
     }
 
-    protected function createMessage(array $message, \Swift_Mime_SimpleMimeEntity $entity): void
+    protected function createMessage(array $message, \Swift_Mime_SimpleMimeEntity $entity)
     {
         if (stripos($message["type"], 'multipart/') !== false && !empty($message["parts"])) {
 
@@ -367,7 +367,7 @@ class MimeParser
         }
     }
 
-    protected function getEncoder(string $type): \Swift_Mime_ContentEncoder
+    protected function getEncoder($type)
     {
         switch ($type) {
             case "base64":
